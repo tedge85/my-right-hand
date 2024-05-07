@@ -4,11 +4,16 @@
 
 # ***save the above notes in publisher app structure file, along with notes on classes***
 
-# Instantiate my_phonebook
 
+## BUGS:
+# displays multiple contacts when searching. /
+
+## UPDATES:
+# view_contacts() now displays sorted entries. /
 
 ## TO DO:
-# \n split fault 
+# sub-menu needed for when contact searched for.
+
 import os
 
 class Menu:        
@@ -45,6 +50,8 @@ class Menu:
     def show_view_menu(self):
         '''Displays sub menu for viewing contacts'''
         my_phonebook.view_contacts()
+        
+        # Show option to delete an entry.
                   
     def show_add_menu(self):
         '''Displays sub menu for adding a contact'''
@@ -63,7 +70,7 @@ class Menu:
         
 class Phonebook:
     
-    contact_list = []
+    contact_list = []    
     
     def __init__(self, txt_file):
         self.txt_file = txt_file
@@ -82,12 +89,17 @@ class Phonebook:
         }
         
         self.contact_list.append(new_contact)
+        
+        # Write the updated contact list to .txt file.
         self.write_to_txt_file("contacts.txt")
         self.save("contacts.txt")
     
     def view_contacts(self):
-        self.save("contacts.txt")        
-        for dict in self.contact_list:            
+        '''Displays the contacts in alphabetical order.'''
+        
+        self.save("contacts.txt")
+        sorted_contact_list = sorted(self.contact_list, key=lambda d: sorted(d.items()))        
+        for dict in sorted_contact_list:            
             for value in dict.values():
                 try: 
                     value != ""                    
@@ -96,20 +108,29 @@ class Phonebook:
                     break
                 except:
                     print("\n!! You have not added a contact yet !!\n")
-        
+                
     def search(self, name):
+        '''Searches for a contact (by name) and then displays name and number.'''
+        
+        # Update contact_list with latest saved contacts.
         self.save("contacts.txt")        
+        
+        # Iterate through list of dictionaries to match seached name to value.
+        i = 0 # Counter variable.       
         for dict in self.contact_list:            
             for value in dict.values():
-                try: 
-                    value.lower() == name.lower()
+                # Increase counter to keep track of values searched through.
+                i+=1
+                if value.lower() == name.lower():
                     print("\n** Contact found! **\n")
                     print(f"name: {dict['name']}\n")
-                    print(f"number: {dict['number']}\n")
-                    break
-                except:
-                    print("\n!! This contact has not yet been added !!\n")
-
+                    print(f"number: {dict['number']}\n")                    
+                    break                
+                    
+                # Condition if there is no matched name after searching all values.
+                elif i == len(dict.values()):
+                    print("\n!! This contact has not yet been added !!\n")                
+                
     def write_to_txt_file(self, txt_file):
         '''Writes changes made to the tasks in task_list to a .txt file.'''
         with open(txt_file, "w") as contacts_file:
