@@ -1,29 +1,3 @@
-## BUGS FIXED:
-# Adding contacts as first action no longer writes over .txt file with one entry. /
-# !! contact not found !! displaying when search called in other method (despite showing contact) / 
-# # Edit method is only called if searched-for name is found. /
-# Double results no longer apparent when name entered to edit. /
-# Contacts can no longer be duplicated /
-# There is now a message when contact list is empty. /
-# The exit option has been removed from the edit menu. /
-
-## UPDATES:
-# sub-menu added after search /
-# Edit name option added /
-# Need to add option for 'e' /
-# View and Search results presented in more user-friendly way. /
-# sub-menu added for when contact searched for /
-# Edit number option added /
-# Delete option added. /
-
-# Changed menu for after search results: -edit contact, -delete contact, -home /
-# Changed menu after viewing all contacts: -add contact /
-# Only numbers accepted when added to 'number' part of contact. /
-# 'Your contacts list is empty message' displays when 'search' is selected and no contacts have been added. /
-# Numbers not accepted as names. /
-# Floats not accepted as names.
-# 'Edit both name and number' option needed.
-
 import os
 
 class Menu:        
@@ -55,6 +29,10 @@ class Menu:
                   self.show_view_menu()
               
               elif menu == 's':
+                  
+                  # Update contact_list with latest contacts from saved .txt file.
+                  my_phonebook.update_contact_list("contacts.txt")  
+
                   # Error message if contact list is empty.
                   if my_phonebook.contact_list == []:
                     print("\n!! Your contacts list is empty !!\n")
@@ -67,7 +45,7 @@ class Menu:
                   
                     # Display message if searched name matches a stored name.
                     if my_phonebook.search_success == True:
-                        print("\n** Contact found! **\n")                  
+                        print("\n** Contact found **\n")                  
                         my_phonebook.search_success = False
                       
                         # Display sub-menu options.
@@ -198,7 +176,7 @@ class Menu:
                     
                     # Save the name and number to a .txt file if valid.
                     my_phonebook.add_contact(name, number)                
-                    print("\n***Contact has been saved***\n")
+                    print("\n** Contact saved **\n")
                     break
             
             # Error capture if non-integer entered.                 
@@ -274,10 +252,7 @@ class Phonebook:
                 print("------------------------\n")                                  
 
     def search(self, name):
-        '''Searches for a contact (by name) and then displays name and number.'''
-        
-        # Update contact_list with latest contacts from saved .txt file.
-        self.update_contact_list("contacts.txt")        
+        '''Searches for a contact (by name) and then displays name and number.'''                      
         
         # Iterate through list of dictionaries to match seached name to value.
         #i = 0 # Counter variable.       
@@ -294,54 +269,69 @@ class Phonebook:
     def edit_contact(self, name):
         '''Allows the user to edit a name or contact.'''        
         while True:
-            option = input("Type 'na' to edit 'name' or 'nu' to edit 'number: " )
+            option = input("Type 'na' to edit 'name', 'nu' to edit 'number', or 'b' to edit both: " )
+            
+            # Edit name and number if chosen:
+            if option == "b":                
+                
+                # Iterate through dictionary to find name then change name and number.
+                for contact in self.contact_list:            
+                    if contact["name"].lower() == name.lower():
+                            new_name = input("Enter new name: ")
+                            new_number = input("Enter new number: ")
+                            contact["name"] = new_name
+                            contact["number"] = new_number
+                            print("\n** Contact changed **\n")
+                            print(f"name: {contact['name']}\n")
+                            print(f"number: {contact['number']}\n")                                                
             
             # Edit name if chosen:
-            if option == "na":                
+            elif option == "na":                
                 
                 # Iterate through dictionary to find and change name.
-                for dict in self.contact_list:            
-                    for value in dict.values():                                                
-                        if value.lower() == name.lower():
+                for contact in self.contact_list:            
+                    if contact["name"].lower() == name.lower():
                             new_name = input("Enter new name: ")
-                            dict["name"] = new_name
-                            print("\n** Contact changed! **\n")
-                            print(f"name: {dict['name']}\n")
-                            print(f"number: {dict['number']}\n")                                                
-
-                            # Write the updated contact list to .txt file.        
-                            self.write_to_txt_file("contacts.txt")
-        
-                            # Make sure self.contact_list matches .txt file. 
-                            self.update_contact_list("contacts.txt")
-
-                            # Return to main menu.
-                            my_menu.show_main_menu()
+                            contact["name"] = new_name
+                            print("\n** Contact changed **\n")
+                            print(f"name: {contact['name']}\n")
+                            print(f"number: {contact['number']}\n")                                                                            
         
             # Edit number if chosen:            
             elif option == "nu":                
                 
-                # Iterate through dictionary to find and change name.
-                for dict in self.contact_list:            
-                    for value in dict.values():                                                
-                        if value.lower() == name.lower():
-                            new_number = input("Enter new number: ")
-                            dict["number"] = new_number
-                            print("\n** Contact changed! **\n")
-                            print(f"name: {dict['name']}\n")
-                            print(f"number: {dict['number']}\n")                                                
+                # Iterate through dictionary to find name then change number.
+                for contact in self.contact_list:            
+                    if contact["name"].lower() == name.lower():                                                                                                    
+                            
+                        while True:
 
-                            # Write the updated contact list to .txt file.        
-                            self.write_to_txt_file("contacts.txt")
+                                # Catch error and display message if string added to 'number' section.
+                                try:
+                                    new_number = int(input("Enter new number: "))
+                                    contact["number"] = new_number
+                                    print("\n** Contact changed **\n")
+                                    print(f"name: {contact['name']}\n")
+                                    print(f"number: {contact['number']}\n")
+                                    break
+                            
+                                except ValueError:
+                                    print("\n! You need to enter digits !\n")                                
+                                        
+            # Write the updated contact list to .txt file.        
+            self.write_to_txt_file("contacts.txt")
         
-                            # Make sure self.contact_list matches .txt file. 
-                            self.update_contact_list("contacts.txt")
+            # Make sure self.contact_list matches .txt file. 
+            self.update_contact_list("contacts.txt")
 
-                            # Return to main menu.
-                            my_menu.show_main_menu()
-            # Invalid choice message:
-            else:
-                print("\n!! Enter a valid choice !!\n")
+            # Return to main menu.
+            my_menu.show_main_menu()
+
+        # Invalid choice message:
+        else: 
+            print("\n!! Enter a valid choice !!\n")
+    
+
     def delete_contact(self, name):
         '''Deletes contact details for given name.'''
         
