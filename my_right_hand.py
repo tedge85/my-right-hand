@@ -165,7 +165,7 @@ class Phonebook:
             with open(txt_file, "w") as default_file:
                 pass
             
-    def add_contact(self, name, number):
+    def add_contact(self):
         '''adds new contact to the contact_list class variable'''
         
         while True:
@@ -183,7 +183,20 @@ class Phonebook:
                 print("\n!! You have entered too many characters. Try again !!")
                 
             else:
-                break                                        
+                # Make sure self.contact_list is updated
+                self.update_contact_list("contacts.txt")
+
+                # Search to check if contact already exists.
+                self.search(name)
+        
+                # Issue error message if contact does exist.
+                if self.search_success == True:
+                    print("\n!! This contact already exists. Pick a different name !!\n")            
+            
+                    # Reset search_success flag.
+                    self.search_success = False
+                else:
+                    break
                 
         while True:                        
             try:
@@ -195,37 +208,18 @@ class Phonebook:
                 # Error message if number is too long.
                 if len(digit_list) > 11:
                     print("\n!! You have entered too many digits. Try again !!")
+                                        
+                else:
                     
-                    
-                else:                    
-                    
-                    # Save the name and number to a .txt file if valid.
-                    my_phonebook.add_contact(name, number)                
-                    print("\n** Contact saved **\n")
                     break
             
             # Error capture if non-integer entered.                 
             except ValueError:
                 print("\n!! You need to enter a number !!\n")
 
-        # Make sure self.contact_list is updated
-        self.update_contact_list("contacts.txt")
-
-        # Search to check if contact already exists.
-        self.search(name)
-        
-        # Issue error message if contact does exist.
-        if self.search_success == True:
-            print("\n!! This contact already exists. Pick a different name !!\n")            
-            
-            # Reset search_success flag.
-            self.search_success = False
-            
-            # Return user to add_contact menu
-            my_menu.show_add_menu()
-        
-        else:
-            # Add contact and number as a dictionary if new contact.
+                                
+                
+        # Add contact and number as a dictionary if new contact.
             new_contact = {
                 "name": name,
                 "number": number
