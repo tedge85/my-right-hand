@@ -2,61 +2,64 @@ import os
 
 class Menu:        
 
-    def show_main_menu(self):
+    def __init__(self, option_1, option_2, option_3, function_1, function_2, function_3, option_4=None, function_4=None):
         '''Displays main menu for user and task-related tasks.'''  
         while True:
         # presenting the menu to the user and 
         # making sure that the user input is converted to lower case.
               print()
-              menu = input('''Select one of the following Options below:          
-          a - Add a contact
-          v - View contacts
-          s - Search for a contact                 
-          e - Exit
+              menu = input(f'''Select one of the following Options below:          
+          {[option_1[0].lower()]} - {option_1} 
+          {[option_2[0].lower()]} - {option_2} 
+          {[option_3[0].lower()]} - {option_3}           
+          {[option_4[0].lower()]} - {option_4} 
           : ''').lower()
 
               menu
 
-              if menu == 'a':
-                  self.show_add_menu()                  
+              if menu == [option_1[0]]:
+                function_1# self.show_add_menu()                  
 
-              elif menu == 'v':
+              elif menu == [option_2[0]]:
+                function_2
                   
                   # Display contacts.
-                  my_phonebook.view_contacts()
+                  # my_phonebook.view_contacts()
                   
                   # Display sub-menu options after viewing contacts.
-                  self.show_view_menu()
+                  #self.show_view_menu()
               
-              elif menu == 's':
+              elif menu == [option_3[0]]:
+                function_3
                   
                   # Update contact_list with latest contacts from saved .txt file.
-                  my_phonebook.update_contact_list("contacts.txt")  
+                  #my_phonebook.update_contact_list("contacts.txt")  
 
                   # Error message if contact list is empty.
-                  if my_phonebook.contact_list == []:
-                    print("\n!! Your contacts list is empty !!\n")
+                  ###MOVE TO PHONEBOOK CLASS METHOD if my_phonebook.contact_list == []:
+                    ###print("\n!! Your contacts list is empty !!\n")
                     
-                  else:
-                    name = input("\nName to search: \n")
+                  ###else:
+                    ###name = input("\nName to search: \n")
                   
                     # Search contacts with name provided.
-                    my_phonebook.search(name)
+                    ###my_phonebook.search(name)
                   
                     # Display message if searched name matches a stored name.
-                    if my_phonebook.search_success == True:
-                        print("\n** Contact found **\n")                  
-                        my_phonebook.search_success = False
+                    ###if my_phonebook.search_success == True:
+                        ###print("\n** Contact found **\n")                  
+                        ###my_phonebook.search_success = False
                       
                         # Display sub-menu options.
-                        self.show_search_menu(name)
+                        ###self.show_search_menu(name)
                       
                     # Display message if searched name does not match a stored name.
-                    else:
-                        print("\n!! This contact has not yet been added !!\n")
+                    ###else:
+                        ###print("\n!! This contact has not yet been added !!\n")
               
-              elif menu == "e":
-                exit()
+              elif menu == [option_4[0]]:
+                function_4
+                #exit()
                 
               else:
                   print("\n!! Choose a valid option. !!\n")
@@ -92,6 +95,8 @@ class Menu:
               else:
                   print("\n!! Choose a valid option. !!\n")
     
+    show_view_menu = Menu("Add a contact", "Edit a contact", "Delete a contact", option_4="Home", function_4=)
+
     def show_search_menu(self, name):
         '''Displays sub-menu for search results.'''                
 
@@ -143,6 +148,26 @@ class Menu:
                 
     def show_add_menu(self):
         '''Displays sub-menu  for adding a contact'''
+        #NOW ALL CONTAINED IN my_phonebook.add_contact
+            
+            
+        
+class Phonebook:
+    
+    contact_list = []
+    search_success = False
+    
+    def __init__(self, txt_file):
+        self.txt_file = txt_file
+           
+        # Create the .txt file if it doesn't exist 
+        if not os.path.exists(txt_file):
+            with open(txt_file, "w") as default_file:
+                pass
+            
+    def add_contact(self, name, number):
+        '''adds new contact to the contact_list class variable'''
+        
         while True:
             
             name = (input("\nEnter contact name: "))
@@ -182,25 +207,7 @@ class Menu:
             # Error capture if non-integer entered.                 
             except ValueError:
                 print("\n!! You need to enter a number !!\n")
-            
-            
-        
-class Phonebook:
-    
-    contact_list = []
-    search_success = False
-    
-    def __init__(self, txt_file):
-        self.txt_file = txt_file
-           
-        # Create the .txt file if it doesn't exist 
-        if not os.path.exists(txt_file):
-            with open(txt_file, "w") as default_file:
-                pass
-            
-    def add_contact(self, name, number):
-        '''adds new contact to the contact_list class variable'''
-        
+
         # Make sure self.contact_list is updated
         self.update_contact_list("contacts.txt")
 
@@ -388,4 +395,5 @@ my_menu = Menu()
 my_phonebook = Phonebook("contacts.txt")
 
 # Call main menu method to give user main options on first screen.
-my_menu.show_main_menu()
+my_menu.show_main_menu("Add a contact", "View contacts", "Search for a contact", "Exit")
+
