@@ -1,161 +1,58 @@
+## BUGS ##
+# Add contact doesn't confirm contact added, just goes to view menu. /
+# Add contact is allowing duplicates.
+# Home command doesn't work on view menu /
+# Search not finding existing contacts.
+# edit does not find existing contacts.
+
 import os
 
-class Menu:        
-
-    def __init__(self, option_1, option_2, option_3, function_1, function_2, function_3, option_4=None, function_4=None):
-        '''Displays main menu for user and task-related tasks.'''  
-        while True:
-        # presenting the menu to the user and 
-        # making sure that the user input is converted to lower case.
-              print()
-              menu = input(f'''Select one of the following Options below:          
-          {[option_1[0].lower()]} - {option_1} 
-          {[option_2[0].lower()]} - {option_2} 
-          {[option_3[0].lower()]} - {option_3}           
-          {[option_4[0].lower()]} - {option_4} 
-          : ''').lower()
-
-              menu
-
-              if menu == [option_1[0]]:
-                function_1# self.show_add_menu()                  
-
-              elif menu == [option_2[0]]:
-                function_2
-                  
-                  # Display contacts.
-                  # my_phonebook.view_contacts()
-                  
-                  # Display sub-menu options after viewing contacts.
-                  #self.show_view_menu()
-              
-              elif menu == [option_3[0]]:
-                function_3
-                  
-                  # Update contact_list with latest contacts from saved .txt file.
-                  #my_phonebook.update_contact_list("contacts.txt")  
-
-                  # Error message if contact list is empty.
-                  ###MOVE TO PHONEBOOK CLASS METHOD if my_phonebook.contact_list == []:
-                    ###print("\n!! Your contacts list is empty !!\n")
-                    
-                  ###else:
-                    ###name = input("\nName to search: \n")
-                  
-                    # Search contacts with name provided.
-                    ###my_phonebook.search(name)
-                  
-                    # Display message if searched name matches a stored name.
-                    ###if my_phonebook.search_success == True:
-                        ###print("\n** Contact found **\n")                  
-                        ###my_phonebook.search_success = False
-                      
-                        # Display sub-menu options.
-                        ###self.show_search_menu(name)
-                      
-                    # Display message if searched name does not match a stored name.
-                    ###else:
-                        ###print("\n!! This contact has not yet been added !!\n")
-              
-              elif menu == [option_4[0]]:
-                function_4
-                #exit()
-                
-              else:
-                  print("\n!! Choose a valid option. !!\n")
-                  
-                  
-    def show_view_menu(self):
-        '''Displays sub-menu for viewing contacts underneath listed contacts.'''        
-        
-        while True:
-        # presenting the menu to the user and 
-        # making sure that the user input is converted to lower case.
-              print()
-              menu = input('''
-          a - Add a contact                 
-          e - Edit a contact
-          d - Delete a contact
-          h - Home          
-          : ''').lower()
-              if menu == 'a':
-                  self.show_add_menu()
-                  
-              if menu == "e":                                    
-                  my_menu.show_edit_menu()
-                  
-              elif menu == "d":
-                  name = input("\nType the name of the contact that you would like to delete: ")
-                  my_phonebook.delete_contact(name)
-                  print("\n\n** Contact deleted **\n\n")
-              
-              elif menu == "h":
-                  my_menu.show_main_menu()
-              
-              else:
-                  print("\n!! Choose a valid option. !!\n")
+class Menu:
     
-    show_view_menu = Menu("Add a contact", "Edit a contact", "Delete a contact", option_4="Home", function_4=)
+    def __init__(self, option_1, option_2, option_3, option_4, function_1, function_2, function_3, function_4):
+        self.option_1 = option_1
+        self.option_2 = option_2
+        self.option_3 = option_3
+        self.option_4 = option_4
+        self.function_1 = function_1
+        self.function_2 = function_2
+        self.function_3 = function_3   
+        self.function_4 = function_4  
 
-    def show_search_menu(self, name):
-        '''Displays sub-menu for search results.'''                
-
-        while True:
+    def show_menu(self):
+        '''Displays main menu for user and task-related tasks.'''  
+        
+        while True:                        
         # presenting the menu to the user and 
         # making sure that the user input is converted to lower case.
-              print()
-              menu = input('''          
-          e - Edit contact
-          d - Delete contact
-          h - Home          
-          : ''').lower()
-              if menu == 'e':
-                  my_phonebook.edit_contact(name)
-                  
-              elif menu == 'd':
-                  my_phonebook.delete_contact(name)
-                  print("\n\n** Contact deleted **\n\n")
-              
-              elif menu == 'h':
-                  my_menu.show_main_menu()
-                  
-              else:
-                  print("\n!! Choose a valid option. !!\n")
-              
-                  
+          print()
+          menu = input(f'''Select one of the following Options below:          
+                {self.option_1[0].lower()} - {self.option_1} 
+                {self.option_2[0].lower()} - {self.option_2} 
+                {self.option_3[0].lower()} - {self.option_3}           
+                {self.option_4[0].lower()} - {self.option_4} 
+                : ''').lower()              
 
-    def show_edit_menu(self):
-        '''Displays sub-menu for editing contacts.'''
-        while True:
-            name = input("\nType the name of the contact that you would like to edit or type 'b' to go back: ")
-            
-            # Going one menu back if 'b' chosen
-            if name.lower() == "b":
-                my_menu.show_view_menu()
-            else:
-                my_phonebook.search(name)
+          if menu == self.option_1[0].lower():
+            self.function_1()                
+
+          elif menu == self.option_2[0].lower():
+            self.function_2()                                  
+              
+          elif menu == self.option_3[0].lower():
+            self.function_3()
+                                                  
+          elif menu == self.option_4[0].lower():
+            self.function_4()                
                 
-                # Call edit method only if name is found.
-                if my_phonebook.search_success == True:
-                    my_phonebook.edit_contact(name)
-                    
-                    # Reset the successful search flag.
-                    my_phonebook.search_success = False
-                    
-                else:
-                    print("\n!! That contact has not yet been added !!\n")
-                
-                
-    def show_add_menu(self):
-        '''Displays sub-menu  for adding a contact'''
-        #NOW ALL CONTAINED IN my_phonebook.add_contact
-            
-            
-        
+          else:
+            print("\n!! Choose a valid option. !!\n")                                                                                                
+  
 class Phonebook:
     
     contact_list = []
     search_success = False
+    embedded_delete = False
     
     def __init__(self, txt_file):
         self.txt_file = txt_file
@@ -187,7 +84,7 @@ class Phonebook:
                 self.update_contact_list("contacts.txt")
 
                 # Search to check if contact already exists.
-                self.search(name)
+                self.embedded_search(name)
         
                 # Issue error message if contact does exist.
                 if self.search_success == True:
@@ -195,6 +92,7 @@ class Phonebook:
             
                     # Reset search_success flag.
                     self.search_success = False
+                    
                 else:
                     break
                 
@@ -216,23 +114,27 @@ class Phonebook:
             # Error capture if non-integer entered.                 
             except ValueError:
                 print("\n!! You need to enter a number !!\n")
-
-                                
+            
                 
         # Add contact and number as a dictionary if new contact.
-            new_contact = {
-                "name": name,
+        new_contact = {
+            "name": name,
                 "number": number
-            }
+        }
             
-            self.contact_list.append(new_contact)                
+        self.contact_list.append(new_contact)                
         
-            # Write the updated contact list to .txt file.        
-            self.write_to_txt_file("contacts.txt")
+        # Write the updated contact list to .txt file.        
+        self.write_to_txt_file("contacts.txt")
         
-            # Make sure self.contact_list matches .txt file. 
-            self.update_contact_list("contacts.txt")
-    
+        # Make sure self.contact_list matches .txt file. 
+        self.update_contact_list("contacts.txt")
+        
+        print("\n** Contact saved **\n")
+
+        # Return to Home menu.
+        main_menu.show_menu()
+        
     def view_contacts(self):
         '''Displays the contacts in alphabetical order.'''        
         
@@ -251,24 +153,89 @@ class Phonebook:
                 print(f"\nname: {contact['name']}\n")
                 print(f"number: {contact['number']}\n\n")
                 print("------------------------\n")                                  
+            
+            view_menu.show_menu()
+    
+    def embedded_search(self, name):
+        '''Searches for a contact (by name) to check if it has already been added to contact_list.'''
+        
+        # Search contacts with name provided.
+        # by iterating through list of dictionaries to match seached name to value.               
+        for dict in self.contact_list:            
+                for value in dict.values():                
+                    if value.lower() == name.lower():
+                        self.search_success = True
+                    else:
+                        self.search_success = False
 
-    def search(self, name):
+    def search(self, name=("\nEnter contact name to search for: \n")):
         '''Searches for a contact (by name) and then displays name and number.'''                      
         
-        # Iterate through list of dictionaries to match seached name to value.
-        #i = 0 # Counter variable.       
-        for dict in self.contact_list:            
-            for value in dict.values():                
-                if value.lower() == name.lower():
-                    self.search_success = True
-                    print("\n------------------------\n")
-                    print(f"\nname: {dict['name']}\n")
-                    print(f"number: {dict['number']}\n")                    
-                    print("\n------------------------\n")
-                    break                                    
+        name = input(name)
+        
+        # Update contact_list with latest contacts from saved .txt file.
+        my_phonebook.update_contact_list("contacts.txt")  
+
+        # Error message if contact list is empty.
+        if my_phonebook.contact_list == []:
+            print("\n!! Your contacts list is empty !!\n")
+                    
+        else:                               
+            # Search contacts with name provided.
+            # by iterating through list of dictionaries to match seached name to value.               
+            for dict in self.contact_list:            
+                for value in dict.values():                
+                    if value.lower() == name.lower():
+                        self.search_success = True
+                        
+                        # Display search result if sing discrete search method.
+                        
+                        print("\n------------------------\n")
+                        print(f"\nname: {dict['name']}\n")
+                        print(f"number: {dict['number']}\n")                    
+                        print("\n------------------------\n")
+                        break
+                  
+                # Display message if searched name matches a stored name (disable message 
+                # if search carried out as part of another method).
+                if my_phonebook.search_success == True:
+                    print("\n** Contact found **\n")                  
+                    
+                    
+                      
+                # Display message if searched name does not match a stored name.
+                else:
+                    print("\n!! This contact has not yet been added !!\n")
+                    
+                # Reset flag
+                my_phonebook.search_success = False
+                      
+                # Display sub-menu options.
+                main_menu.show_menu()
+                                            
     
-    def edit_contact(self, name):
-        '''Allows the user to edit a name or contact.'''        
+    def edit_contact(self):
+        '''Allows the user to edit a name or contact.'''         
+        
+        while True:
+            name = input("\nType the name of the contact that you would like to edit or type 'b' to go back: ")
+            
+            # Going one menu back if 'b' chosen
+            if name.lower() == "b":
+                main_menu.show_menu()
+            else:
+                self.embedded_search(name)
+                
+                # Move to next edit prompt if name is found.
+                if self.search_success == True:
+                    break
+                    
+                    # Reset the successful search.
+                    self.search_success = False                    
+                    
+                else:
+                    print("\n!! That contact has not yet been added !!\n")
+               
         while True:
             option = input("Type 'na' to edit 'name', 'nu' to edit 'number', or 'b' to edit both: " )
             
@@ -326,23 +293,29 @@ class Phonebook:
             self.update_contact_list("contacts.txt")
 
             # Return to main menu.
-            my_menu.show_main_menu()
+            main_menu.show_menu()
 
         # Invalid choice message:
         else: 
             print("\n!! Enter a valid choice !!\n")
     
 
-    def delete_contact(self, name):
+    def delete_contact(self):
         '''Deletes contact details for given name.'''
         
+        name = input("\nType the name of the contact that you would like to delete: ")                  
+
         # iterate through contacts then remove dictionary when name matched.
         for dict in self.contact_list:
             for value in dict.values():                                                
                 if value.lower() == name.lower():
                     self.contact_list.remove(dict)
                     break
-                
+        
+        # Displau confirmation message if using discrete delete method.
+        if self.embedded_delete == False:
+            print("\n\n** Contact deleted **\n\n")
+            
         # Write the updated contact list to .txt file.        
         self.write_to_txt_file("contacts.txt")
         
@@ -384,10 +357,15 @@ class Phonebook:
                 # Save each contact in a list of dictionaries.                                                  
                 self.contact_list.append(curr_contacts)                    
 
-# Instantiate the classes                
-my_menu = Menu()
+# Instantiate the phonebook class and initialise the contacts.txt document.                
 my_phonebook = Phonebook("contacts.txt")
 
-# Call main menu method to give user main options on first screen.
-my_menu.show_main_menu("Add a contact", "View contacts", "Search for a contact", "Exit")
+# Instantiate the main menu and view menu.
+main_menu = Menu("Add a contact", "View contacts", "Search for a contact", "Exit", my_phonebook.add_contact, my_phonebook.view_contacts, 
+                 my_phonebook.search, exit)
 
+view_menu = Menu("Add a contact", "Edit a contact", "Delete a contact", "Home", my_phonebook.add_contact, my_phonebook.edit_contact, 
+                my_phonebook.delete_contact, main_menu.show_menu)
+
+# Display the main menu.
+main_menu.show_menu()
