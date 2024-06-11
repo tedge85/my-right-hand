@@ -1,12 +1,3 @@
-## BUG FIX ##
-
-# 'back' no longer works when navigating edit menu. /
-
-# Search refactored to include embedded_search() /
-
-# User can no longer enter floats as a name. /
-
-
 import os
 
 ######################################################################## Class creation ##########################################################################
