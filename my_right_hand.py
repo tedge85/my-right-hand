@@ -158,11 +158,13 @@ class Phonebook:
             self.main_menu()                        
             
         else:
-            self.display_contact()
+            self.display_confirmation_of_change_or_addition()
                 
             # Reset flag.
             self.search_success = False
             
+            # Keep track of when a search has already been done so that different logic is applied
+            # after calling methods from next sub-menu e.g. delete *this* contact.
             self.search_already_done = True
                                                        
             self.sub_menu_2()              
@@ -221,7 +223,7 @@ class Phonebook:
             # to use in display_contact().
             self.embedded_search(self.new_name)
             
-        self.display_contact()
+        self.display_confirmation_of_change_or_addition()
         
         self.write_to_txt_file(self.txt_file)                
                 
@@ -436,7 +438,7 @@ class Phonebook:
         self.search_name = ""       
 
 
-    def display_contact(self):
+    def display_confirmation_of_change_or_addition(self):
         '''Displays a confirmation of searched-for, added or edited contact.'''
         
         if self.discrete_searching and self.search_already_done == False:
