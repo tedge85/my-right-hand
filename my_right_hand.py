@@ -5,21 +5,22 @@ import os
 class Menu:
     
     def __init__(self, option_1, option_2, option_3, option_4, method_1, method_2, method_3, method_4):
+        '''Allows for the creation of main menus and sub-menus'''
         
-        # Options to pick from menu.
         self.option_1 = option_1
         self.option_2 = option_2
         self.option_3 = option_3
         self.option_4 = option_4
         
-        # Methods to call.
+        
         self.method_1 = method_1
         self.method_2 = method_2
         self.method_3 = method_3   
         self.method_4 = method_4  
 
     def show_menu(self):
-        '''Displays the menu.'''  
+        '''Displays the menu to the users, with options numbers corresponding 
+           to matching method nunmbers.'''  
         
         while True:                        
         # presenting the menu to the user and 
@@ -48,7 +49,8 @@ class Menu:
             print("\n!! Choose a valid option. !!\n")            
   
 class Phonebook:            
-    
+    '''Creates a phonebook in which contacts can be added, edited, viewed, 
+       or searched for.'''
     def __init__(self, txt_file, main_menu, sub_menu_1, sub_menu_2):
         
         # Text file to save to
@@ -65,8 +67,9 @@ class Phonebook:
         # Instance variable needed to access current contact searched for.
         self.current_contact = ""                
         self.new_name = ""
-        self.new_number = 1
-        self.current_index = 1
+        self.new_number = 0
+        self.current_index = 0
+        self.search_name = ""
 
         # Flags.
         self.search_success = False
@@ -161,7 +164,7 @@ class Phonebook:
     def add_contact(self):
         '''Adds new contact to the contact_list instance variable.'''
         
-        self.update_contact_list("contacts.txt")
+        #self.update_contact_list("contacts.txt")#################################################################################
         
         # Find out if user is editing.
         if self.editing_name_only == False and self.editing_number_only == False and self.editing_both == False:
@@ -207,8 +210,9 @@ class Phonebook:
         # Reset instance variables.
         self.current_contact = ""                
         self.new_name = ""
-        self.current_index = 1
-        self.new_number = 1       
+        self.new_number = 0
+        self.current_index = 0
+        self.search_name = ""       
 
     def display_contact(self):
         '''Displays a confirmation of searched-for, added or edited contact.'''
@@ -249,15 +253,14 @@ class Phonebook:
         
         # iterate through list of dictionaries to see if inputted name
         # matches a contact name.       
-        for dict in self.contact_list:
-            print(dict["name"].lower()) 
+        for dict in self.contact_list:             
             if dict["name"].lower() == name.lower():
                 self.search_success = True
             
                 # Keep track of found contact to use in edit method.
                 self.current_contact = dict
                 self.current_index = self.contact_list.index(self.current_contact)                                                                                            
-        
+                
         return    
     
     def search(self):
@@ -279,7 +282,7 @@ class Phonebook:
             self.embedded_search(input("\nEnter contact name to search for: "))                                               
                                                                                                                                                   
         if self.search_success == False: 
-            print("\n!! This contact has not yet been added !!\n")
+            print(f"\n!! '{self.current_contact}' not yet been added !!\n")
                 
             # Return to main menu to allow user to search again.
             self.main_menu()                        
@@ -288,7 +291,7 @@ class Phonebook:
             self.display_contact()
                 
             # Reset flag.
-            self.search_success = False 
+            self.search_success = False
             
             self.search_already_done = True
                                                        
@@ -301,20 +304,26 @@ class Phonebook:
             # Prompt user to input name to edit if they haven't selected 'edit this contact'.
             if self.search_already_done == False:
                 
-                search_name = input("\nType the name of the contact that you would like to edit or type 'back' to go back: ")            
+                self.search_name = input("\nType the name of the contact that you would like to edit or type 'back' to go back: ")            
         
                 # Find inputted name and save to self.current_contact
-                self.embedded_search(search_name)
+                self.embedded_search(self.search_name)
+                
+            if self.search_already_done == False and self.search_success == False:
+                print(f"\n!! This contact has not yet been added !!\n")
+                self.main_menu()
             
+            elif self.search_name.lower() == "back":
+                
                 # Reset flag.
-                self.search_success = False
-            
-            if search_name.lower() == "back":
+                self.search_success = False                
                 main_menu.show_menu()
         
             else:
                 option = input("Type 'na' to edit 'name', 'nu' to edit 'number', or 'b' to edit both: " ).lower()
-                            
+                # Reset flag
+                self.search_success = False
+                
                 if option == "b":
                     self.editing_both = True
                     # edit_name() logic will lead user to edit_number() if 'both' selected.
@@ -369,10 +378,10 @@ class Phonebook:
         # Make sure self.new_name has a value so thet display_contact has a 
         # valid variable to display after add_contact called.
         if self.editing_number_only:
-            self.new_name = self.contact_list[self.current_index]["name"]
+            self.new_name = self.contact_list[self.current_index]["name"]            
             self.add_contact()                        
             
-        else:                
+        else:            
             # Details are saved within add_contact()
             self.add_contact()                        
         
@@ -404,7 +413,7 @@ class Phonebook:
         
         if self.search_success == False:
             
-            print("\n! This contact has not been added yet !\n")
+            print("\n! This contact has not yet been added !\n")
             
 
         else:
