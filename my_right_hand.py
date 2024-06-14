@@ -102,8 +102,8 @@ class Phonebook:
         self.update_contact_list("contacts.txt")
         
         # Sort contact list alphabetically by name.
-        sorted_contact_list = sorted(self.contact_list, key=lambda d: d['name'])
-                
+        sorted_contact_list = self.bubble_sort(self.contact_list)                
+
         if sorted_contact_list == []:
             print("\n!! Your contacts list is empty !!\n") 
         else:            
@@ -113,6 +113,34 @@ class Phonebook:
                 print("------------------------\n")                                  
             
             self.sub_menu_1()
+    
+
+    def bubble_sort(self, contact_list):
+        '''Sorts the contact list alphabetically by name.'''
+        swapped = False
+
+        n = len(contact_list)
+
+        for i in range(n):
+
+            # Nested loop to iterate through each dictionary, indexed as 'j'
+            for j in range(0, n-i-1):
+
+                # Variables for adjacent name values.
+                name1 = contact_list[j]["name"]
+                name2 = contact_list[j+1]["name"]
+
+                # Swap contact order if name value closer to a in alphabet.
+                if name1 > name2:
+
+                    contact_list[j], contact_list[j+1] = contact_list[j+1], contact_list[j]
+                    swapped = True
+
+            # Exit outer loop and stop comparing if single swap not made (i.e. list already in order).
+            if not swapped:
+                break
+
+        return contact_list
     
 
     def embedded_search(self, name):
@@ -488,7 +516,7 @@ class Phonebook:
                 self.contact_list.append(curr_contacts)                    
 
 
-############################################# Instantiating objects ######################################################################################
+############################################# Instantiating objects ###########################################################################################
 
 # Instantiate the phonebook class with placeholders for the menus that are yet to be instantiated.                
 my_phonebook = Phonebook("contacts.txt", None, None, None)
