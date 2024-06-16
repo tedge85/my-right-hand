@@ -96,7 +96,7 @@ class Phonebook:
         '''Displays the contacts in alphabetical order.'''        
         
         # Reset flags if arriving here after a search.
-        if self.search_already_done == True:
+        if self.search_already_done:
             self.reset_flags_and_variables()
         
         self.update_contact_list("contacts.txt")
@@ -165,7 +165,7 @@ class Phonebook:
            and then displays name and number.'''                                                      
         print(self.search_already_done)
         # If directed here from 'search again' option, reset flags.
-        if self.search_already_done == True:
+        if self.search_already_done:
             self.reset_flags_and_variables()
 
         self.discrete_searching = True                
@@ -186,7 +186,7 @@ class Phonebook:
             self.main_menu()                        
             
         else:
-            self.display_confirmation_of_change_or_addition()
+            self.display_success_of_search_or_change_or_addition()
                 
             # Reset flag.
             self.search_success = False
@@ -201,7 +201,7 @@ class Phonebook:
         '''Deletes contact details for given name.'''
         
         # Reset flags if arriving here after a search.
-        if self.search_already_done == True:
+        if self.search_already_done:
             self.reset_flags_and_variables()
         
         name = input("\nType the name of the contact that you would like to delete: ")                  
@@ -251,7 +251,7 @@ class Phonebook:
             # to use in display_contact().
             self.embedded_search(self.new_name)
             
-        self.display_confirmation_of_change_or_addition()
+        self.display_success_of_search_or_change_or_addition()
         
         self.write_to_txt_file(self.txt_file)                
                 
@@ -283,7 +283,10 @@ class Phonebook:
                 
             
             elif len(self.new_name) > 20:
-                print("\n!! You have entered too many characters. Try again !!")            
+                print("\n!! You have entered too many characters. Try again !!")
+                
+            elif self.new_name == "" or self.new_name == " ":
+                ("\n!! You did not enter a name. Try again !!")
                                             
             else:                
 
@@ -466,7 +469,7 @@ class Phonebook:
         self.search_name = ""       
 
 
-    def display_confirmation_of_change_or_addition(self):
+    def display_success_of_search_or_change_or_addition(self):
         '''Displays a confirmation of searched-for, added or edited contact.'''
         
         if self.discrete_searching and self.search_already_done == False:
