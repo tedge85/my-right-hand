@@ -64,7 +64,7 @@ class Phonebook:
         # List of dictionaries in which to save contacts.       
         self.contact_list = []
         
-        # Instance variable needed to access current contact searched for.
+        # Instance variables needed to access current contact searched for.
         self.current_contact = ""                
         self.new_name = ""
         self.new_number = 0
@@ -99,10 +99,9 @@ class Phonebook:
         if self.search_already_done:
             self.reset_flags_and_variables()
         
-        self.update_contact_list("contacts.txt")
-        
-        # Sort contact list alphabetically by name.
-        sorted_contact_list = self.bubble_sort(self.contact_list)                
+        self.update_contact_list(self.txt_file)
+                
+        sorted_contact_list = self.bubble_sort(self.contact_list) # Sort contact list alphabetically by name.                
 
         if sorted_contact_list == []:
             print("\n!! Your contacts list is empty !!\n") 
@@ -126,11 +125,11 @@ class Phonebook:
             # Nested loop to iterate through each dictionary, indexed as 'j'
             for j in range(0, n-i-1):
 
-                # Variables for adjacent name values.
+                # Variables for name values in dictionaries next to each other in contact_list.
                 name1 = contact_list[j]["name"]
                 name2 = contact_list[j+1]["name"]
 
-                # Swap contact order if name value closer to a in alphabet.
+                # Swap contact order if name value closer to 'a' in alphabet.
                 if name1 > name2:
 
                     contact_list[j], contact_list[j+1] = contact_list[j+1], contact_list[j]
@@ -140,56 +139,62 @@ class Phonebook:
             if not swapped:
                 break
 
-        return contact_list
+        return contact_list    
     
+    
+    def binary_search(self, name, contact_list, start=0, end=None):
+        '''searches for inputted name by dividing contact_list in half each time.'''
 
-    def embedded_search(self, name):
-        '''Searches for a contact (by name) to check if it exists as part of other
-           methods. Assigns value to self.current_contact and self.current_index
-           to be used when displaying contact details.'''
-        
-        # iterate through list of dictionaries to see if inputted name
-        # matches a contact name.       
-        for dict in self.contact_list:                        
-            if dict["name"].lower() == name.lower():
-                self.search_success = True
+        if end is None:
+            end = len(contact_list) - 1
+
+        if start <= end:            
+            halfway = (start + end) // 2 # Use integer division to avoid error with index due to float.              
             
-                # Keep track of found contact to use in edit method.
-                self.current_contact = dict
-                self.current_index = self.contact_list.index(self.current_contact)                                                                                            
+            # Ensure rest of program - e.g. delete() and embedded_delete() - can access the contact found within self.current_contact and self.current_index variable.
+            if contact_list[halfway]["name"].lower() == name.lower():
+                self.current_contact = contact_list[halfway] 
+                self.current_index = self.contact_list.index(self.current_contact) 
+                self.search_success = True
+
+            elif contact_list[halfway]["name"].lower() > name.lower():
                 
-        return    
+                return self.binary_search(name, contact_list, start, halfway - 1) # Search in the left half of the contact_list.  
+            else:
+                
+                return self.binary_search(name, contact_list, halfway + 1, end) # Search in the right half of the contact_list.
+        else:
+            
+            return # Return if not found, leaving self.search_success as False
     
     def search(self):
         '''Searches for a contact (by name) when 'search' is discretely selected 
            and then displays name and number.'''                                                      
-        print(self.search_already_done)
-        # If directed here from 'search again' option, reset flags.
+        
+        # If directed here from 'search again' option, flags need to be reset.
         if self.search_already_done:
             self.reset_flags_and_variables()
 
         self.discrete_searching = True                
         
-        self.update_contact_list("contacts.txt")  
+        self.update_contact_list(self.txt_file)  
         
         if self.contact_list == []:
             print("\n!! Your contacts list is empty !!\n")
             self.main_menu()
             
         else:                        
-            self.embedded_search(input("\nEnter contact name to search for: "))                                               
+            self.binary_search(input("\nEnter contact name to search for: "), self.bubble_sort(self.contact_list))                                               
                                                                                                                                                   
         if self.search_success == False: 
             print(f"\n!! This contact has not yet been added !!\n")
-                
-            # Return to main menu to allow user to search again.
-            self.main_menu()                        
+                            
+            self.main_menu() # Return to main menu to allow user to search again.                        
             
         else:
             self.display_success_of_search_or_change_or_addition()
-                
-            # Reset flag.
-            self.search_success = False
+                            
+            self.search_success = False # Reset flag.
             
             # Keep track of when a search has already been done so that different logic is applied
             # after calling methods from next sub-menu e.g. delete *this* contact.
@@ -206,7 +211,7 @@ class Phonebook:
         
         name = input("\nType the name of the contact that you would like to delete: ")                  
 
-        self.embedded_search(name)
+        self.binary_search(name, self.bubble_sort(self.contact_list)) # Search to find out if name exists and assign the dictionary to self.current_contact if it does.
         
         if self.search_success == False:
             
@@ -219,17 +224,23 @@ class Phonebook:
             self.contact_list.remove(self.current_contact)                                 
         
             print("\n\n** Contact deleted **\n\n")        
-                
-            # Write the updated contact list to .txt file.        
-            self.write_to_txt_file("contacts.txt")                    
-        
+                                    
+            self.write_to_txt_file(self.txt_file) 
+            
         self.reset_flags_and_variables()
         
         self.main_menu
 
+    def insert_new_contact(self, name, number):
+        '''Inserts a new contact into the self.contact_list list of dictionaries.'''
+        
+        new_contact = {"name": name, "number": number}                
+        self.contact_list.append(new_contact)
+        
+        return
 
     def add_contact(self):
-        '''Adds new contact to the contact_list instance variable 
+        '''Adds new contact to the self.contact_list instance variable 
            or saves edited contacts to said list.'''                                
 
         # Find out if user is adding a new contact (as opposed to editing) and perform checks for valid data
@@ -237,19 +248,12 @@ class Phonebook:
         if self.editing_name_only == False and self.editing_number_only == False and self.editing_both == False and self.details_checked == False:
             
             self.adding_new_contact = True                        
-            
-            # This check will prompt for a name, check then lead onto prompting for number before checking.
-            self.check_name_is_valid()      
+                        
+            self.check_name_is_valid() # This check will prompt for a name, check its validity then lead onto prompting for a number before checking number validity.      
                
         elif self.adding_new_contact:
-            
-            # Add contact and number as a dictionary if adding a new contact (i.e. if not in editing mode).                                   
-            new_contact = {"name": self.new_name, "number": self.new_number}                
-            self.contact_list.append(new_contact)
-            
-            # Use embedded search to get the current_index of newly added name, ready
-            # to use in display_contact().
-            self.embedded_search(self.new_name)
+                                                           
+            self.insert_new_contact(self.new_name, self.new_number) # Add new_name and new_number as a dictionary if adding a new contact (i.e. if not in editing mode).                                    
             
         self.display_success_of_search_or_change_or_addition()
         
@@ -274,8 +278,7 @@ class Phonebook:
             
             
             if self.new_name.isnumeric() or self.name_is_a_float(self.new_name):
-                
-                # Error message if number added instead of name.
+                                
                 print("\n!! You need to enter a name, not a number !!\n")
             
             elif self.new_name.lower() == "back":
@@ -289,16 +292,13 @@ class Phonebook:
                 ("\n!! You did not enter a name. Try again !!")
                                             
             else:                
-
-                # Search to check if contact already exists.
-                self.embedded_search(self.new_name)
-        
-                # Issue error message if contact does exist.
+                
+                self.binary_search(self.new_name, self.bubble_sort(self.contact_list)) # Search to check if contact already exists.
+                        
                 if self.search_success:
                     print("\n!! This contact already exists. Pick a different name !!\n")            
-            
-                    # Reset search_success flag.
-                    self.search_success = False
+                                
+                    self.search_success = False # Reset search_success flag so as not to disrupt logic further into program.
                 
                 # Call edit_number method to return to edit rest of edit_number process if 
                 # check_number_is_valid was called at the start of edit_number method.
@@ -325,9 +325,8 @@ class Phonebook:
         while True:                        
             try:
                 self.new_number = int(input("Enter new contact number: "))                
-
-                # Change number inputted to list of digits so they can be counted.
-                digit_list = [int(x) for x in str(self.new_number)]
+                
+                digit_list = [int(x) for x in str(self.new_number)] # Change number inputted to list of digits so their length can be counted.
                                 
                 if len(digit_list) > 11:
                     print("\n!! You have entered too many digits. Try again !!")                                
@@ -351,29 +350,26 @@ class Phonebook:
             if self.search_already_done == False:
                 
                 self.search_name = input('''\nType the name of the contact that you would like to edit or type 'back' to go back: ''')            
-        
-                # Find inputted name from self.contact_list and save contact to self.current_contact.
-                self.embedded_search(self.search_name)
+                        
+                self.binary_search(self.search_name, self.bubble_sort(self.contact_list)) # Find inputted name from self.contact_list and save contact to self.current_contact.
                 
             if self.search_already_done == False and self.search_success == False:
                 print(f"\n!! This contact has not yet been added !!\n")
                 self.sub_menu_1()
             
             elif self.search_name.lower() == "back":
-                
-                # Reset flag.
+                                
                 self.search_success = False                
                 main_menu.show_menu()
         
             else:
                 option = input("Type 'na' to edit 'name', 'nu' to edit 'number', or 'b' to edit both: ").lower()
-                # Reset flag
+                
                 self.search_success = False
                 
                 if option == "b":
-                    self.editing_both = True
-                    # edit_name() logic will lead user to edit_number() if 'both' selected.
-                    self.edit_name()
+                    self.editing_both = True                    
+                    self.edit_name() # edit_name() logic will lead user to edit_number() if 'both' selected.
                 elif option == "na":
                     self.editing_name_only = True     
                     self.edit_name()
@@ -391,9 +387,8 @@ class Phonebook:
         if self.name_checked == False:
             self.check_name_is_valid()        
         
-        elif self.adding_new_contact == False:
-            # Change the contact in contact_list if name check has been passed.            
-            self.contact_list[self.current_index]["name"] = self.new_name                                                                
+        elif self.adding_new_contact == False:                        
+            self.contact_list[self.current_index]["name"] = self.new_name # Change the contact in contact_list if name check has been passed.                                                                
             
         # Make sure self.new_number has a value so thet display_contact has a 
         # valid variable to display after add_contact called.
@@ -402,12 +397,10 @@ class Phonebook:
             self.add_contact()                                                                             
         
         else:                        
-            
-            # Make sure current_contact is known when editing both name & number.
-            self.embedded_search(self.new_name)
-            
-            # Return to edit number if 'edit both' or 'add contact' option chosen.
-            self.edit_number()
+                        
+            self.binary_search(self.new_name, self.bubble_sort(self.contact_list)) # Make sure current_contact is known when editing both name & number.
+                        
+            self.edit_number() # Return to edit number if 'edit both' or 'add contact' option chosen.
 
 
     def edit_number(self):        
@@ -429,8 +422,8 @@ class Phonebook:
             self.add_contact()                        
             
         else:            
-            # Details are saved within add_contact()
-            self.add_contact()                        
+            
+            self.add_contact() # Details are now saved within add_contact()                        
         
                                
     def delete_current_contact(self):
@@ -485,6 +478,7 @@ class Phonebook:
     def write_to_txt_file(self, txt_file):
         '''Writes changes made to the contacts in self.contact_list to a .txt file.'''
         
+        # Change each dictionary in self.contact_list to a sublist of string pairs so that it can be written to .text file.
         with open(txt_file, "w") as contacts_file:
             contact_list_to_write = []
             for c in self.contact_list:
@@ -499,30 +493,25 @@ class Phonebook:
         '''Saves the updated .txt file to contact_list.'''
         
         with open(txt_file, "r+") as current_contacts:
+                        
+            self.contact_data = current_contacts.read().split("\n") # Read the contents and move them into a list, separated where there is a newline character.
+            self.contact_data = [c for c in self.contact_data if c != ""] # Reformat list so that it doesn't contain blank spaces.
             
-            self.contact_data = current_contacts.read().split("\n")
-            self.contact_data = [c for c in self.contact_data if c != ""]
-
-            # Clear self.contact_list of old data.
-            self.contact_list = []
+            self.contact_list = [] # Clear self.contact_list of old data.
             
             for contact_str in self.contact_data:
                 curr_contacts = {}
-                
-                # Split list components with semicolon and add each component 
-                # to a dictionary for each contact.
+                                
                 contact_components = contact_str.split(";")                 
                 curr_contacts['name'] = contact_components[0]
                 curr_contacts['number'] = contact_components[1]                
-
-                # Save each contact in a list of dictionaries.                                                  
+                                                                  
                 self.contact_list.append(curr_contacts)                    
 
 
 ############################################# Instantiating objects ###########################################################################################
 
-# Instantiate the phonebook class with placeholders for the menus that are yet to be instantiated.                
-my_phonebook = Phonebook("contacts.txt", None, None, None)
+my_phonebook = Phonebook("contacts.txt", None, None, None) # Instantiate the phonebook class with placeholders for the menus that are yet to be instantiated.                
 
 # Instantiate the main menu and sub-menus.
 main_menu = Menu("Add a contact", "View contacts", "Search for a contact", "Exit", my_phonebook.add_contact, my_phonebook.view_contacts, 
@@ -542,5 +531,4 @@ my_phonebook.sub_menu_2 = search_menu.show_menu
 
 ########################################### Initialising the program #########################################################################################
 
-# Display the main menu to show as the first page of the program.
-main_menu.show_menu()
+main_menu.show_menu() # Display the main menu as the first page of the program.
